@@ -1,0 +1,31 @@
+from scapy.all import sniff
+from scapy.layers.inet import IP, TCP, UDP, ICMP
+def packet_callback(packet):
+if IP in packet:
+ip_layer = packet[IP]
+src_ip = ip_layer.src
+dst_ip = ip_layer.dst
+protocol = ip_layer.proto
+# Determine the protocol
+if protocol == 6:
+protocol_name = 'TCP'
+elif protocol == 17:
+protocol_name = 'UDP'
+elif protocol == 1:
+protocol_name = 'ICMP'
+else:
+protocol_name = 'Other'
+# Log the packet information
+print(f"Source IP: {src_ip}, Destination IP: {dst_ip}, Protocol: {protocol_name}")
+# Display payload data if available
+if len(packet) > len(ip_layer):
+payload = packet[len(ip_layer):]
+print(f"Payload: {payload}")
+# Set up the packet sniffer
+def start_sniffer(interface=None):
+print(f"Starting packet sniffer on interface: {interface if interface else 'default'}")
+sniff(prn=packet_callback, iface=interface, store=0)
+if __name__ == "__main__":
+# Specify the network interface or leave as None for default
+network_interface = None  # Example: 'eth0' for Linux or 'Wi-Fi' for Windows
+start_sniffer(network_interface)
